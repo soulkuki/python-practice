@@ -6,6 +6,7 @@ operationMap = {
 	'write': 'w',
 	'append': 'a',
 }
+firstLineContent = ''
 
 currentDir = Path(__file__).parent
 path1 = os.path.join(os.path.dirname(__file__), 'demo.text')
@@ -15,6 +16,14 @@ print(f'当前路径os: {path1}')
 print(f'当前路径pathlib: {path2}')
 
 def read(file):
+	global firstLineContent
+	for index, line in enumerate(file, start=1):
+		print(f'第{index}行内容: {line.strip()}')
+	file.seek(0)
+	for index, line in enumerate(file, start=1):
+		if 'python' in line:
+			print(f'包含python的是第{index}行的内容: {line.strip()}')
+	file.seek(0)
 	fullContent = file.read()
 	contentSize = len(fullContent)
 	contentLines = fullContent.split('\n')
@@ -22,12 +31,15 @@ def read(file):
 	file.seek(0)
 	fiveContentSize = file.read(5)
 	file.seek(0)
-	firstLineContent = file.readline()
-	secondLineContent = file.readline()
-	allLineContent = file.readlines()
+	firstLineContent = file.readline().strip()
+	secondLineContent = file.readline().strip()
 	file.seek(0)
-	for line in file:
-		print(f'每行内容: {line.strip()}')
+	allLineContent = file.readlines()
+	newLineContent = firstLineContent.replace('python', 'java')
+	isPython = 'python' in firstLineContent
+	isJavaStart = firstLineContent.startswith('java')
+	isLanguageEnd = secondLineContent.endswith('编程语言')
+	
 
 	print(f'完整内容: \n{fullContent}')
 	print(f'内容长度: {contentSize}')
@@ -37,8 +49,16 @@ def read(file):
 	print(f'第一行内容: {firstLineContent}')
 	print(f'第二行内容: {secondLineContent}')
 	print(f'所有行内容: {allLineContent}')
-def pratice(operation):
-	with open(path2, operationMap[operation], encoding='utf-8') as file:
+	print(f'修改后的第一行内容: {newLineContent}')
+	print(f'第一行是否包含python: {isPython}')
+	print(f'第一行是否以java开头: {isJavaStart}')
+	print(f'第二行是否以编程语言结尾: {isLanguageEnd}')
+
+def write(file):
+	file.write(firstLineContent)
+
+def pratice(operation, path = path2):
+	with open(path, operationMap[operation], encoding='utf-8') as file:
 		match operation:
 			case 'read':
 				read(file)
@@ -51,7 +71,7 @@ def pratice(operation):
 def main():
 	try:
 		pratice('read')
-		# pratice('write')
+		pratice('write', f'{currentDir}/target.text')
 		# pratice('append')
 	except Exception as e:
 		if isinstance(e, FileNotFoundError):
@@ -70,4 +90,3 @@ def main():
 		print('结束')
 		
 main()
-
